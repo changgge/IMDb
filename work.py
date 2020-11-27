@@ -103,16 +103,16 @@ def findNumInStr(rawStr,errorNum='error'):
         return int(aa[0].replace(',',''))
     else:
         if errorNum=='error':
-            raise NameError('找不到数字',rawStr)
+            raise NameError('Cannot find number',rawStr)
         else:
             return errorNum
 
 
 #create a new table every time run this program
-c.execute('''DROP TABLE IF EXISTS movie2''')  #如果存在就删除
+c.execute('''DROP TABLE IF EXISTS movie2''')  
 c.execute('''CREATE TABLE movie2 (title text, director text, Popularity int,country text,language text,releaseDate text,genres text)''')
 
-c.execute('''DROP TABLE IF EXISTS movieActor2''')  #如果存在就删除
+c.execute('''DROP TABLE IF EXISTS movieActor2''') 
 c.execute('''CREATE TABLE movieActor2 (title text,stars text)''')
 
 def craw_movie_info(aMovieUrl):
@@ -191,13 +191,13 @@ for i in range(3,68,1):
     pagesEurlList.append(r'https://www.imdb.com/search/title/?title_type=feature&year=2020-11-01,2020-12-31&start={0}'.format(i*50+1))
 kk = 0
 for eurl1 in pagesEurlList:
-    print('第{0}页'.format(kk))
+    print('Page {0}'.format(kk))
     kk+=1
     eurlList = craw_movie_list(eurl1)
     jj=0
     for eurl in eurlList:
         time.sleep(random.randint(4,10))
-        print('第{0}个'.format(jj),eurl)
+        print('Number {0}'.format(jj),eurl)
         jj+=1
         try:
             aMovieDict = craw_movie_info(eurl)

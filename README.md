@@ -17,7 +17,7 @@ requests, BeautifulSoup, sqlite3, flask
 
 ## Data sources
 ### 1. Data origin
-The website [IMDb] (’https://www.imdb.com/’) is used in this project, which displays the information about released movies. URLs including information we need have been visited ad crawled, such as: https://www.imdb.com/search/title/?title_type=feature&year=2020-11-01,2020-12-31&start=1
+The website [IMDb] (https://www.imdb.com/) is used in this project, which displays the information about released movies. URLs including information we need have been visited ad crawled, such as: https://www.imdb.com/search/title/?title_type=feature&year=2020-11-01,2020-12-31&start=1
 
 ### 2. Get the data
 First, crawl the general information of 2,200 movies from the last two months of 2020. 

@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>ECharts3 Ajax</title>
+    <script src="{{ url_for('static', filename='jquery-3.2.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='echarts.js') }}"></script>
+</head>
+
+<body>
+    <!--prepare a dom for quanlity of movies-->
+    <div id="genreMnum" style="height:500px;border:1px solid #ccc;padding:10px;"></div>
+    <!--prepare a dom for percentage of movies-->
+    <div>
+        <div id="genrePercent1" style="width:30%;float:left;height:500px;padding:10px;"></div>  
+        <div id="genrePercent2" style="width:60%;float:right;height:500px;padding:10px;"></div>
+        <div id="genrePercent" style="height:500px;border:1px solid #ccc;padding:10px;"></div>
+    </div>
+    
+    <!--为ECharts准备一个不同日期电影个数的Dom-->
+    <div id="dateMnum" style="height:500px;border:1px solid #ccc;padding:10px;"></div>
+    <!--为ECharts准备一个不同数量的前最喜欢的电影-->
+    <!--prepare a dom for percentage of different language movies-->
+    <div>
+        <div id="languagePercent1" style="width:30%;float:left;height:500px;padding:10px;"></div>  
+        <div id="languagePercent2" style="width:60%;float:right;height:500px;padding:10px;"></div>
+        <div id="languagePercent" style="height:500px;border:1px solid #ccc;padding:10px;"></div>
+    </div>
+
+    <!--为ECharts准备一个不同演员濱电影平均评分的图-->
+    <div id="actorPopularity" style="height:500px;border:1px solid #ccc;padding:10px;"></div>
+    <input type='text' id='numOfActor'> how many actors u want display</input>
+    <button onclick="tt2()">confirm</button>
+
+    <script type="text/javascript">
+
+    var myChart2 = echarts.init(document.getElementById('genreMnum'));
+    // 显示标题，图例和空的坐标轴
+    myChart2.setOption({
+        title: {
+            text: 'quantity of diffrent genre moives'
+        },
+        tooltip: {},
+        xAxis: {
+            data: [],
+            axisLabel:{  
+                interval:0,//横轴信息全部显示  
+                rotate:-15//-15度角倾斜显示  
+                }
+        },
+        yAxis: {name:'num of moives'
+            },
+        series: [{
+            name: 'num of moives',
+            type: 'bar',
+            data: []
+        }]
+    });
+    myChart2.showLoading(); // 显示加载动画
+    // 异步加载数据
+    $.get('/movieData').done(function (data) {
+        myChart2.hideLoading(); // 隐藏加载动画
+
+        // 填入数据
+        myChart2.setOption({
+            xAxis: {
+                data: data.genreMNum[0]
+            },
+            series: [{
+                name: 'num of moives',
+                data: data.genreMNum[1].map(parseFloat)
+            }]
+        });
+    });
+
+
+    var myChart22 = echarts.init(document.getElementById('genrePercent1'));
+    // 显示标题，图例和空的坐标轴
+    myChart22.setOption({
+        backgroundColor: 'white',
+        title: {
+            text: 'quantity of movies belongs to each genre',
+            left: 'center',
+            top: 10,
+            textStyle: {
+                color: '#ccc'
+            }
+        },
+        tooltip : {
+            trigger: 'item',
+            formatter: "{a} <br/>{b} : {d}%"
+        },
+
+        visualMap: {
+            show: false,
+             min: 0,  //min和max表示的是值的区间，只有所有值都落在这个区间内 颜色区分的才好
+             max: 1000,
+            inRange: {
+                colorLightness: [0, 0.6] //这个表示颜色的明亮程度，如果右边的改成1，可能会出现纯白色的图片
+            }
+        },
+        series : [
+            {
+                name:'quantity of movies',
+                type:'pie',
+                clockwise:'true',
+                startAngle:'0',
+                radius : '70%',
+                center: ['50%', '50%'],//控制左侧留白与上侧留白
+                data:[
+                     ],
+            }
+        ]
+    });
+    myChart22.showLoading(); // 显示加载动画
+    // 异步加载数据
+    $.get('/movieData').done(function (data) {
+        myChart22.hideLoading(); // 隐藏加载动画
+
+        // 填入数据
+        myChart22.setOption({
+            series: [{
+                name: 'quantity of movies',
+                data: data.genreMNum2
+            }]
+        });
+    });
+
+
+    var myChart23 = echarts.init(document.getElementById('genrePercent2'));
+    // 显示标题，图例和空的坐标轴
+    myChart23.setOption({
+        title: {
+            text: 'moives belongs to selected genre'
+        },
+        tooltip: {},
+        xAxis: {
+            data: [],
+            axisLabel:{  
+                interval:0,//横轴信息全部显示  
+                rotate:-15//-15度角倾斜显示  
+                }
+        },
+        yAxis: {name:'Popularity'},
+        series: [{
+            name: 'moive',
+            type: 'bar',
+            data: []
+        }]
+    });
+
+    
+    function eConsole(param) {
+    // 饼状图点击事件
+　　//alert(option.series[0].data.length);
+　　//alert(option.series[0].data[i]);
+　　//var selectedGenre = param.dataIndex //获取当前点击索引，
+　　//alert(param.dataIndex);
+    myChart23.showLoading(); // 显示加载动画
+    // 异步加载数据
+    $.get('/movieData').done(function (data) {
+        myChart23.hideLoading(); // 隐藏加载动画
+
+        // 填入数据
+        myChart23.setOption({
+            xAxis: {
+                data: data.genreMovies[data.genreMNum2[param.dataIndex]['name']][0].slice(0,10)
+            },
+            series: [{
+                name: 'movies',
+                data: data.genreMovies[data.genreMNum2[param.dataIndex]['name']][1].slice(0,10).map(parseFloat)
+            }]
+        });
+    });
+　　clickFunc(param.dataIndex);//执行点击效果
+    }
+
+    myChart22.on("click", eConsole);
+
+    //<!--为ECharts准备一个不同日期电影个数的Dom-->
+    var myChart3 = echarts.init(document.getElementById('dateMnum'));
+    // 显示标题，图例和空的坐标轴
+    myChart3.setOption({
+        title: {
+            text: 'quantity of moives released in diffrent date'
+        },
+        tooltip: {},
+        xAxis: {
+            data: []
+        },
+        yAxis: {name:'num of moives'},
+        series: [{
+            name: 'num of moives',
+            type: 'line',
+            data: []
+        }]
+    });
+    myChart3.showLoading(); // 显示加载动画
+    // 异步加载数据
+    $.get('/movieData').done(function (data) {
+        myChart3.hideLoading(); // 隐藏加载动画
+
+        // 填入数据
+        myChart3.setOption({
+            xAxis: {
+                data: data.dateMNum[0]
+            },
+            series: [{
+                name: 'num of moives',
+                data: data.dateMNum[1].map(parseFloat)
+            }]
+        });
+    });
+
+    // the pie chart of different language movies
+    var myChart41 = echarts.init(document.getElementById('languagePercent1'));
+    // 显示标题，图例和空的坐标轴
+    myChart41.setOption({
+        backgroundColor: 'white',
+        title: {
+            text: 'quantity of movies belongs to each language',
+            left: 'center',
+            top: 10,
+            textStyle: {
+                color: '#ccc'
+            }
+        },
+        tooltip : {
+            trigger: 'item',
+            formatter: "{a} <br/>{b} : {d}%"
+        },
+
+        visualMap: {
+            show: false,
+             min: 0,  //min和max表示的是值的区间，只有所有值都落在这个区间内 颜色区分的才好
+             max: 1300,
+            inRange: {
+                colorLightness: [0, 0.6] //这个表示颜色的明亮程度，如果右边的改成1，可能会出现纯白色的图片
+            }
+        },
+        series : [
+            {
+                name:'quantity of movies',
+                type:'pie',
+                clockwise:'true',
+                startAngle:'0',
+                radius : '70%',
+                center: ['50%', '50%'],//控制左侧留白与上侧留白
+                data:[
+                     ],
+            }
+        ]
+    });
+    myChart41.showLoading(); // 显示加载动画
+    // 异步加载数据
+    $.get('/movieData').done(function (data) {
+        myChart41.hideLoading(); // 隐藏加载动画
+
+        // 填入数据
+        myChart41.setOption({
+            series: [{
+                name: 'quantity of movies',
+                data: data.languageMNum2
+            }]
+        });
+    });
+
+
+    var myChart42 = echarts.init(document.getElementById('languagePercent2'));
+    // 显示标题，图例和空的坐标轴
+    myChart42.setOption({
+        title: {
+            text: 'moives belongs to selected language'
+        },
+        tooltip: {},
+        xAxis: {
+            data: [],
+            axisLabel:{  
+                interval:0,//横轴信息全部显示  
+                rotate:-15//-15度角倾斜显示  
+                }
+        },
+        yAxis: {name:'Popularity'},
+        series: [{
+            name: 'moive',
+            type: 'bar',
+            data: []
+        }]
+    });
+
+    
+    function eConsole2(param) {
+    // 饼状图点击事件
+　　//alert(option.series[0].data.length);
+　　//alert(option.series[0].data[i]);
+　　//var selectedGenre = param.dataIndex //获取当前点击索引，
+　　//alert(param.dataIndex);
+    myChart42.showLoading(); // 显示加载动画
+    // 异步加载数据
+    $.get('/movieData').done(function (data) {
+        myChart42.hideLoading(); // 隐藏加载动画
+
+        // 填入数据
+        myChart42.setOption({
+            xAxis: {
+                data: data.languageMovies[data.languageMNum2[param.dataIndex]['name']][0].slice(0,10)
+            },
+            series: [{
+                name: 'movies',
+                data: data.languageMovies[data.languageMNum2[param.dataIndex]['name']][1].slice(0,10).map(parseFloat)
+            }]
+        });
+    });
+　　clickFunc(param.dataIndex);//执行点击效果
+    }
+
+
+    myChart41.on("click", eConsole2);
+
+
+    //<!--为ECharts准备一个不同日期电影个数的Dom-->
+    var myChart5 = echarts.init(document.getElementById('actorPopularity'));
+    // 显示标题，图例和空的坐标轴
+    myChart5.setOption({
+        title: {
+            text: 'most N wanted actors'
+        },
+        color: ['#c50000','#2f4554', '#61a0a8'],
+        tooltip: {},
+        xAxis: {
+            data: [],
+            axisLabel:{  
+                interval:0,//横轴信息全部显示  
+                rotate:-15//-15度角倾斜显示  
+                }
+            },
+        yAxis: {name:'average popularity'},
+        series: [{
+            name: 'popularity',
+            type: 'bar',
+            data: []
+        }]
+    });
+    myChart5.showLoading(); // 显示加载动画
+        // 异步加载数据
+        $.get('/movieData').done(function (data) {
+            myChart5.hideLoading(); // 隐藏加载动画
+            // 填入数据
+            myChart5.setOption({
+                xAxis: {
+                    data: data.actorPopular[0].slice(0,parseInt(10))
+                },
+                series: [{
+                    name: 'average popularity',
+                    data: data.actorPopular[1].slice(0,parseInt(10)).map(parseFloat)
+                }]
+            });
+        });
+    function tt2(){
+        var numOfactor = document.getElementById("numOfActor").value;
+        myChart5.showLoading(); // 显示加载动画
+        // 异步加载数据
+        $.get('/movieData').done(function (data) {
+            myChart5.hideLoading(); // 隐藏加载动画
+            // 填入数据
+            myChart5.setOption({
+                xAxis: {
+                    data: data.actorPopular[0].slice(0,parseInt(numOfactor))
+                },
+                series: [{
+                    name: 'average popularity',
+                    data: data.actorPopular[1].slice(0,parseInt(numOfactor)).map(parseFloat)
+                }]
+            });
+        });
+
+    }
+    </script>
+
+
+</body>
+</html>

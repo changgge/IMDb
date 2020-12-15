@@ -10,7 +10,10 @@ Final Project.
 ## Usage
 
 Use work.py and dataSupport.py to crawl, clean and store data to SQL.
+
 This process has been done, and the results are in mydb.db
+
+Cached results will be stored in cache.json if you re-run the scraping process.
 
 Use app.py to see flask charts displayed on a temporary website (link will be shown in the terminal when you execute the file).
 
